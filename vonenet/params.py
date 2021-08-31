@@ -98,3 +98,21 @@ def generate_gabor_param(features, seed=0, rand_flag=False, sf_corr=0, sf_max=9,
         sf = 2**sf
 
     return sf, ori, phase, nx, ny
+
+def generate_MN_param(features, seed=0, rand_flag=False, sf_corr=0, sf_max=9, sf_min=0, tf_max=4, tf_min=0, kernel_size_t=16, fps=30,):
+    sf, ori, phase, nx, ny = generate_gabor_param(features, seed, rand_flag, sf_corr, sf_max, sf_min)
+    
+    #create tf based on generate_gabor_param func
+    tf_bins = np.array([0.5, 0.7, 1.0, 1.4, 2.0, 2.8, 4.0, 5.6, 8])
+    tf_dist = np.array([1,  1,  1, 1, 1, 1, 1, 1])
+    tfmax_ind = np.where(tf_bins < tf_max)[0][-1]
+    tfmin_ind = np.where(tf_bins >= tf_min)[0][0]
+
+    tf_bins = tf_bins[tfmin_ind:tfmax_ind+1]
+    tf_dist = tf_dist[tfmin_ind:tfmax_ind]
+
+    tf_dist = tf_dist / tf_dist.sum()
+    
+    tf = sample_dist(tf_dist, tf_bins, features, scale='log2')
+    
+    return sf, ori, phase, nx, ny, tf
